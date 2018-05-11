@@ -1,0 +1,43 @@
+type: ddns-service
+
+components:
+  apiPing:
+    type: rest-api
+    inputs:
+      gateway: aws-apigateway
+      routes:
+        /{token}:
+          get:
+            function: ${functionPing}
+
+  functionPing:
+    type: aws-lambda
+    inputs:
+      handler: index.handler
+      root: ${self.path}/code/ping
+      memory: 512
+      timeout: 15
+      runtime: nodejs8.10
+      env:
+        productTableName: ddns-records
+
+  db:
+    type: aws-dynamodb
+    inputs:
+      region: us-east-1
+      tables:
+        - name: ddns-records
+          hashKey: token
+          indexes:
+            - name: UserIndex
+              type: global
+              hashKey: user
+            - name: RecordIndex
+              type: global
+              hashKey: record
+          schema:
+            token: string
+            user: string
+            record: string
+          options:
+            timestamps: true
