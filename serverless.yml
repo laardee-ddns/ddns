@@ -4,6 +4,7 @@ components:
   apiPing:
     type: rest-api
     inputs:
+      name: ddns-ping
       gateway: aws-apigateway
       routes:
         /{token}:
@@ -13,6 +14,7 @@ components:
   functionPing:
     type: aws-lambda
     inputs:
+      name: ddns-ping
       handler: index.handler
       root: ${self.path}/code/ping
       memory: 512
